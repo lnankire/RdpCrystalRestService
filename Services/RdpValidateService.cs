@@ -350,6 +350,34 @@ public sealed class RdpValidateService
             bool val = Regex.IsMatch(SafeElementValue(e, 0), @"^\d.+$");
             e.ConditionValid = !val;
         }
+        else if (e.CodeCondition.Id == "DuplicateCheck")
+        {
+            var duplicates = new HashSet<string>();
+            if (e.CurrentSegment.Elements.Count > 6)
+            {
+                string sv7 = e.CurrentSegment.Elements[6]?.ToString() ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(sv7))
+                {
+                    Console.WriteLine($"Checking for duplicates in segment {e.CurrentSegment.Name} with value: {sv7}"); 
+                }
+                /*
+                for (int i = 1; i < e.CurrentSegment.Elements.Count - 1; i++)
+                {
+                    string num = e.CurrentSegment.Elements[i]?.ToString() ?? string.Empty;
+                    if (string.IsNullOrWhiteSpace(num))
+                    {
+                        continue;
+                    }
+                    else if (!duplicates.Add(num))
+                    {
+                            e.ConditionValid = true;
+                            return;                        
+                    }
+                }
+                */
+            }
+
+        }
     }
 
     private void HandleValueLookupCondition(CodeConditionEventArgs e, bool isValueFoundCondition)
