@@ -355,26 +355,26 @@ public sealed class RdpValidateService
             var duplicates = new HashSet<string>();
             if (e.CurrentSegment.Elements.Count > 6)
             {
-                string sv7 = e.CurrentSegment.Elements[6]?.ToString() ?? string.Empty;
-                if (!string.IsNullOrWhiteSpace(sv7))
+                 for (int i = 1; i < e.CurrentSegment.Elements.Count; i++)
                 {
-                    Console.WriteLine($"Checking for duplicates in segment {e.CurrentSegment.Name} with value: {sv7}"); 
+                     var sv7 = e.CurrentSegment.Elements[i];
+                     if (sv7.Composite)
+                     {
+                             _logger.LogInformation($"Check duplicates in Composite, element count: {sv7.Elements.Count}");
+
+                             foreach (var repVal in sv7.Elements)
+                                {
+                                        if(!duplicates.Add(repVal.ToString()))
+                                        {
+                                                _logger.LogInformation($"Is duplicate {repVal}");
+                                                e.ConditionValid = true;
+                                                return;
+                                        }
+                                }
+
+                     }
                 }
-                /*
-                for (int i = 1; i < e.CurrentSegment.Elements.Count - 1; i++)
-                {
-                    string num = e.CurrentSegment.Elements[i]?.ToString() ?? string.Empty;
-                    if (string.IsNullOrWhiteSpace(num))
-                    {
-                        continue;
-                    }
-                    else if (!duplicates.Add(num))
-                    {
-                            e.ConditionValid = true;
-                            return;                        
-                    }
-                }
-                */
+                
             }
 
         }
