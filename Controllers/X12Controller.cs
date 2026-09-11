@@ -359,7 +359,8 @@ public sealed class X12Controller : ControllerBase
 
         foreach (EDIError error in validator.Errors)
         {
-            sb.Append("Line: ").Append(error.LineNumber)
+            sb.Append("Line: ").Append(error)
+            .Append(", Transaction: ").Append(error.STSegment)
               .Append(", ValidatingSegment: ").Append(error.ValidatingSegment)
               .Append(", Loop: ").Append(error.Loop)
               .Append(", Segment: ").Append(error.Segment)
