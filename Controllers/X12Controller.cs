@@ -115,7 +115,15 @@ public sealed class X12Controller : ControllerBase
                         details = _irisService.RdpErrorsToIris(nameSpace, rdpResp.validator, x12Id, sessionId ?? record.SessionId, rdpResp.ackStr, logIris);
                     }
 
-                    var response = new { Transaction = record.Transaction, FileName = record.FilePath, Status = rdpResp.status, Details = details, ACK = Truncate(rdpResp.ackStr) };
+                    var response = new
+                    {
+                        Transaction = record.Transaction,
+                        FileName = record.FilePath,
+                        Status = rdpResp.status ?? string.Empty,
+                        Details = details,
+                        ACK = rdpResp.ackStr ?? string.Empty
+                    };
+
                     if (rdpResp.status?.StartsWith("FAIL", StringComparison.OrdinalIgnoreCase) == true)
                     {
                         return ValidationFailure(response);
@@ -273,7 +281,7 @@ public sealed class X12Controller : ControllerBase
                 FileName = fileName ?? validationFile,
                 Status = rdpResp.status ?? string.Empty,
                 Details = details,
-                ACK = Truncate(rdpResp.ackStr)
+                ACK = rdpResp.ackStr ?? string.Empty
             };
 
             resultStatus = rdpResp.status ?? string.Empty;
@@ -351,7 +359,7 @@ public sealed class X12Controller : ControllerBase
     {
         if (validator == null)
         {
-            return Truncate(dbWriteResult);
+            return dbWriteResult;
         }
 
         var sb = new StringBuilder();
@@ -375,22 +383,7 @@ public sealed class X12Controller : ControllerBase
             sb.Append("IRIS Logging: ").Append(dbWriteResult).Append(';');
         }
 
-        return Truncate(sb.ToString());
-    }
-
-    private string Truncate(string? value)
-    {
-        if (string.IsNullOrEmpty(value))
-        {
-            return string.Empty;
-        }
-
-        if (value.Length <= _runtimeOptions.MaxResponseDetailsLength)
-        {
-            return value;
-        }
-
-        return value.Substring(0, _runtimeOptions.MaxResponseDetailsLength);
+        return sb.ToString();
     }
 
     private IActionResult ValidationFailure(object response)
